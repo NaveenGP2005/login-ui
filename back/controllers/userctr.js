@@ -6,7 +6,7 @@ exports.signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const existingUser = await User.findOne({ email });
-    
+
     if (existingUser) {
       if (!existingUser.isVerified) {
         // Resend OTP if user exists but not verified
@@ -15,10 +15,10 @@ exports.signup = async (req, res) => {
         existingUser.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
         await existingUser.save();
         await sendOTPEmail(email, otp);
-        return res.status(200).json({ 
+        return res.status(200).json({
           message: "OTP resent to your email",
           requiresVerification: true,
-          email: email
+          email: email,
         });
       }
       return res.status(400).json({ error: "User already exists" });
@@ -26,22 +26,23 @@ exports.signup = async (req, res) => {
 
     const otp = generateOTP();
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    const user = new User({ 
-      name, 
-      email, 
+
+    const user = new User({
+      name,
+      email,
       password: hashedPassword,
       otp: otp,
-      otpExpires: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+      otpExpires: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
     });
-    
+
     await user.save();
     await sendOTPEmail(email, otp);
-    
-    res.status(201).json({ 
-      message: "OTP sent to your email. Please verify to complete registration.",
+
+    res.status(201).json({
+      message:
+        "OTP sent to your email. Please verify to complete registration.",
       requiresVerification: true,
-      email: email
+      email: email,
     });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -66,7 +67,9 @@ exports.verifyOTP = async (req, res) => {
     }
 
     if (user.otpExpires < new Date()) {
-      return res.status(400).json({ error: "OTP has expired. Please request a new one." });
+      return res
+        .status(400)
+        .json({ error: "OTP has expired. Please request a new one." });
     }
 
     user.isVerified = true;
@@ -74,7 +77,9 @@ exports.verifyOTP = async (req, res) => {
     user.otpExpires = null;
     await user.save();
 
-    res.status(200).json({ message: "Email verified successfully! You can now login." });
+    res
+      .status(200)
+      .json({ message: "Email verified successfully! You can now login." });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -109,7 +114,7 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    
+
     if (!user) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
@@ -121,10 +126,10 @@ exports.login = async (req, res) => {
       user.otpExpires = new Date(Date.now() + 10 * 60 * 1000);
       await user.save();
       await sendOTPEmail(email, otp);
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: "Email not verified. OTP sent to your email.",
         requiresVerification: true,
-        email: email
+        email: email,
       });
     }
 
@@ -139,10 +144,10 @@ exports.login = async (req, res) => {
     req.session.name = user.name;
     req.session.isAuthenticated = true;
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: "Login successful",
       name: user.name,
-      email: user.email
+      email: user.email,
     });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -155,7 +160,7 @@ exports.logout = async (req, res) => {
       if (err) {
         return res.status(500).json({ error: "Could not log out" });
       }
-      res.clearCookie('connect.sid');
+      res.clearCookie("connect.sid");
       res.status(200).json({ message: "Logged out successfully" });
     });
   } catch (error) {
@@ -166,10 +171,10 @@ exports.logout = async (req, res) => {
 exports.checkSession = async (req, res) => {
   try {
     if (req.session && req.session.isAuthenticated) {
-      res.status(200).json({ 
+      res.status(200).json({
         isAuthenticated: true,
         name: req.session.name,
-        email: req.session.email
+        email: req.session.email,
       });
     } else {
       res.status(401).json({ isAuthenticated: false });

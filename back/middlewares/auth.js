@@ -1,39 +1,43 @@
-const joi=require("joi");
+const joi = require("joi");
 
-const signupvalidator=(req,res,next)=>{
-    const schema=joi.object({
-        name:joi.string().required().min(3).max(30),
-        email:joi.string().email().required(),
-        password:joi.string().required().min(6).max(30)
-    });
-    const {error}=schema.validate(req.body);
-    if(error){
-        return res.status(400).json({error:error.message});
-    }
-    next();
-}
-const loginvalidator=(req,res,next)=>{
-    const schema=joi.object({     
-        email:joi.string().email().required(),
-        password:joi.string().required().min(6).max(30)
-    });
-    const {error}=schema.validate(req.body);
-    if(error){
-        return res.status(400).json({error:error.message});
-    }
-    next();
-}
+const signupvalidator = (req, res, next) => {
+  const schema = joi.object({
+    name: joi.string().required().min(3).max(30),
+    email: joi.string().email().required(),
+    password: joi.string().required().min(6).max(30),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+  next();
+};
+const loginvalidator = (req, res, next) => {
+  const schema = joi.object({
+    email: joi.string().email().required(),
+    password: joi.string().required().min(6).max(30),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+  next();
+};
 
 const otpvalidator = (req, res, next) => {
-    const schema = joi.object({
-        email: joi.string().email().required(),
-        otp: joi.string().required().length(6).pattern(/^[0-9]+$/)
-    });
-    const { error } = schema.validate(req.body);
-    if (error) {
-        return res.status(400).json({ error: error.message });
-    }
-    next();
-}
+  const schema = joi.object({
+    email: joi.string().email().required(),
+    otp: joi
+      .string()
+      .required()
+      .length(6)
+      .pattern(/^[0-9]+$/),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.message });
+  }
+  next();
+};
 
-module.exports={signupvalidator,loginvalidator,otpvalidator};
+module.exports = { signupvalidator, loginvalidator, otpvalidator };

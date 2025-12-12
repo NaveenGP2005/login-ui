@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { handleerror, handlesuccess, handleinfo } from "./toast";
-import image from "../images/team.jpg";
 
 const VerifyOTP = () => {
   const [otp, setOtp] = useState("");
@@ -76,65 +75,93 @@ const VerifyOTP = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-orange-100 to-green-200">
-      <div className="bg-orange-100 p-6 rounded-lg shadow-lg w-80">
-        <header className="flex flex-col items-center">
-          <img className="w-20 mx-auto mb-4" src={image} alt="Team Logo" />
-          <h2 className="text-orange-700 text-xl font-bold">Decentra Solve</h2>
-        </header>
-
-        <div className="text-center mb-4">
-          <h3 className="text-green-700 text-lg font-semibold">Verify Your Email</h3>
-          <p className="text-gray-600 text-sm mt-2">
-            We've sent a 6-digit OTP to <br />
-            <span className="font-medium text-orange-700">{email}</span>
-          </p>
-        </div>
-
-        <form onSubmit={handleVerify} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Enter 6-digit OTP"
-            className="w-full p-3 border rounded text-center text-2xl tracking-widest"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            maxLength={6}
-            required
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full px-6 py-3 rounded-xl bg-orange-600 text-white text-lg font-medium shadow-lg relative overflow-hidden group disabled:opacity-50"
-          >
-            <span className="absolute inset-0 bg-green-700 scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100"></span>
-            <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-              {loading ? "Verifying..." : "Verify OTP"}
-            </span>
-          </button>
-        </form>
-
-        <div className="mt-4 text-center">
-          <p className="text-gray-600 text-sm">Didn't receive the OTP?</p>
-          <button
-            onClick={handleResendOTP}
-            disabled={resendLoading || countdown > 0}
-            className="text-orange-700 hover:text-green-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {countdown > 0
-              ? `Resend in ${countdown}s`
-              : resendLoading
-              ? "Sending..."
-              : "Resend OTP"}
-          </button>
-        </div>
-
-        <p className="mt-4 text-center text-green-700 text-sm">
-          <Link to="/signup" className="text-orange-700 hover:text-green-700">
-            ← Back to Signup
-          </Link>
-        </p>
-        <ToastContainer />
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex justify-center items-center p-4">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-green-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-40 right-10 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-teal-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
+
+      {/* OTP Verification Card */}
+      <div className="relative w-full max-w-md">
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-8 space-y-8">
+          {/* Header */}
+          <div className="text-center space-y-2">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
+              Verify Email
+            </h1>
+            <p className="text-gray-300 text-sm">
+              We sent a code to your email
+            </p>
+          </div>
+
+          {/* Email Display */}
+          <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
+            <p className="text-gray-400 text-sm">Verification code sent to:</p>
+            <p className="text-white font-semibold mt-1">{email}</p>
+          </div>
+
+          {/* OTP Input Form */}
+          <form onSubmit={handleVerify} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-300">
+                Enter 6-digit Code
+              </label>
+              <input
+                type="text"
+                placeholder="000000"
+                className="w-full px-4 py-4 bg-white/10 border border-white/20 rounded-lg text-white text-center text-3xl tracking-widest placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/50 transition-all font-mono"
+                value={otp}
+                onChange={(e) =>
+                  setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
+                maxLength={6}
+                required
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading || otp.length !== 6}
+              className="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-green-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Verifying..." : "Verify Code"}
+            </button>
+          </form>
+
+          {/* Resend OTP Section */}
+          <div className="border-t border-white/10 pt-6">
+            <p className="text-gray-400 text-sm text-center mb-4">
+              Didn't receive the code?
+            </p>
+            <button
+              onClick={handleResendOTP}
+              disabled={resendLoading || countdown > 0}
+              className="w-full px-6 py-3 bg-white/5 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {countdown > 0
+                ? `Resend in ${countdown}s`
+                : resendLoading
+                ? "Sending..."
+                : "Resend Code"}
+            </button>
+          </div>
+
+          {/* Back Link */}
+          <div className="text-center pt-4">
+            <Link
+              to="/signup"
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              ← Back to Sign Up
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <ToastContainer />
     </div>
   );
 };
